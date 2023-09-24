@@ -42,6 +42,10 @@ def main():
 def signup():
     return render_template('sign-up.html')
 
+@app.route('/sign-in')
+def signin():
+    return render_template('sign-in.html')
+
 @app.route('/')
 def intro():
     return render_template('start.html')
@@ -72,6 +76,23 @@ def signUp():
     else:
         msg='Enter correct password values!!!'
         return render_template('sign-up.html',msg=msg)
+    
+@app.route('/sign-in',methods=['POST'])
+def signIn():
+   msg=''
+   if request.method == 'POST':
+     email=request.form['form2Example17']
+     password=request.form['form2Example27']
+     conn = mysql.connect()
+     cursor = conn.cursor()
+     cursor.execute("Select password from signup where password=%s and email=%s",(password,email,))
+     a=cursor.fetchone()
+     if a:
+        msg='You have successfully Logged in!'
+        return render_template('hospital.html',msg=msg)
+     else:
+        msg='Invalid password/email ID!'
+        return render_template('sign-in.html',msg=msg)    
     
 @app.route('/booking-schedule',methods=['POST'])
 def appoint():
@@ -147,7 +168,7 @@ def rescheduler():
         if a:
             changedoctor= request.form['changedoctor']
             reschedule_counter=reschedule_counter+1
-            appoint_id="AH"+a[0][0]+str(reschedule_counter)
+            appoint_id="RH"+a[0][0]+str(reschedule_counter)
             cursor.execute("Delete from appointment where appointment_id=%s",(appointment_id,))
             conn.commit()
             cursor.execute("INSERT INTO appointment (patient_id,appointment_id, category,date,time,department, symptom,doctorname) VALUES (% s, % s, % s, % s, % s, %s, %s, %s)",
